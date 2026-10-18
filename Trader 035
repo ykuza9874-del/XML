@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeFlow · realistic trading dashboard</title>
+  <!-- Fonts & icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #0b0e14;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #e8edf5;
+      line-height: 1.4;
+      padding: 16px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* main dashboard panel */
+    .dashboard {
+      max-width: 1440px;
+      width: 100%;
+      background-color: #0b0e14;
+      border-radius: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* --- header / top bar --- */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, #2b6eef, #1dc9a0);
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+      box-shadow: 0 8px 18px -6px rgba(43, 110, 239, 0.4);
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.4px;
+      background: linear-gradient(to right, #ffffff, #b0c4de);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      background: #141b26;
+      padding: 4px;
+      border-radius: 40px;
+      border: 1px solid #1f2a38;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #8f9eb0;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 18px;
+      border-radius: 30px;
+      transition: all 0.2s;
+    }
+
+    .nav-links a.active {
+      background: #1e2a3a;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-links a:hover {
+      color: #d0e0ff;
+    }
+
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .balance-badge {
+      background: #141b26;
+      border: 1px solid #1f2a38;
+      padding: 8px 16px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .balance-badge i {
+      color: #1dc9a0;
+      font-size: 14px;
+    }
+
+    .balance-badge span {
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .avatar {
+      background: #1e2a3a;
+      width: 42px;
+      height: 42px;
+      border-radius: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #2d3d52;
+      color: #9bb5e0;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .avatar:hover {
+      background: #253242;
+      border-color: #3f5a7a;
+    }
+
+    /* --- main grid --- */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1.2fr;
+      gap: 20px;
+    }
+
+    /* universal card style */
+    .card {
+      background: #11171f;
+      border-radius: 24px;
+      border: 1px solid #1e2835;
+      padding: 20px;
+      transition: border 0.2s;
+      box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.6);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .card-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-header h2 i {
+      color: #3b82f6;
+      font-size: 16px;
+    }
+
+    .card-header .more-btn {
+      background: transparent;
+      border: none;
+      color: #6b7b8f;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 30px;
+      transition: background 0.15s;
+    }
+
+    .card-header .more-btn:hover {
+      background: #1e2835;
+      color: #b0c8f0;
+    }
+
+    /* ---- watchlist card ---- */
+    .watchlist .coin-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #1b232f;
+    }
+
+    .watchlist .coin-row:last-child {
+      border-bottom: none;
+    }
+
+    .coin-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .coin-icon {
+      width: 34px;
+      height: 34px;
+      background: #1a2432;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      color: #f0b90b;
+    }
+
+    .coin-icon.eth { color: #627eea; }
+    .coin-icon.sol { color: #14f195; }
+    .coin-icon.xrp { color: #23292f; background: #ffffff; color: #000; }
+
+    .coin-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #eef2f6;
+    }
+
+    .coin-ticker {
+      font-size: 12px;
+      color: #7e8c9e;
+      margin-top: 2px;
+    }
+
+    .price-info {
+      text-align: right;
+    }
+
+    .price {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.2px;
+    }
+
+    .change {
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .change.up { color: #1dc9a0; }
+    .change.down { color: #f87171; }
+
+    /* ---- portfolio chart card ---- */
+    .chart-container {
+      padding: 8px 0 0 0;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .portfolio-value {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      color: #ffffff;
+    }
+
+    .portfolio-label {
+      font-size: 13px;
+      color: #7e8c9e;
+      margin-bottom: 4px;
+    }
+
+    .change-large {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1dc9a0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(29, 201, 160, 0.1);
+      padding: 4px 12px;
+      border-radius: 40px;
+    }
+
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 140px;
+      gap: 8px;
+      margin: 20px 0 12px;
+    }
+
+    .bar-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bar {
+      width: 100%;
+      background: linear-gradient(to top, #2b6eef, #4f9cf7);
+      border-radius: 6px 6px 2px 2px;
+      min-height: 4px;
+      transition: height 0.3s ease, background 0.2s;
+      box-shadow: 0 -2px 10px rgba(43, 110, 239, 0.3);
+    }
+
+    .bar.green {
+      background: linear-gradient(to top, #1dc9a0, #34d399);
+      box-shadow: 0 -2px 10px rgba(29, 201, 160, 0.3);
+    }
+
+    .bar-label {
+      font-size: 10px;
+      color: #6d7d92;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    /* ---- order book card ---- */
+    .order-book .order-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 6px 0;
+      font-family: 'Inter', monospace;
+    }
+
+    .order-row .price-bid { color: #1dc9a0; font-weight: 600; }
+    .order-row .price-ask { color: #f87171; font-weight: 600; }
+    .order-row .amount { color: #9aa9bb; }
+    .order-row .total { color: #cbd5e1; }
+
+    .order-depth-bar {
+      height: 2px;
+      background: #1e2835;
+      margin: 2px 0 4px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .order-depth-bar .fill {
+      height: 100%;
+      width: 60%;
+      background: #1dc9a0;
+      border-radius: 4px;
+    }
+
+    .order-depth-bar .fill.ask {
+      background: #f87171;
+    }
+
+    .divider {
+      height: 1px;
+      background: #1f2a38;
+      margin: 10px 0;
+    }
+
+    .last-price {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1dc9a0;
+      text-align: center;
+      margin: 8px 0 12px;
+      letter-spacing: -0.4px;
+    }
+
+    .last-price small {
+      font-size: 13px;
+      color: #8b9bb0;
+      font-weight: 400;
+      margin-left: 6px;
+    }
+
+    /* --- bottom trade panel --- */
+    .trade-panel {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 20px;
+    }
+
+    .trade-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      background: #0b1119;
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid #1e2835;
+      width: fit-content;
+    }
+
+    .tab {
+      padding: 8px 24px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      background: transparent;
+      color: #7e8c9e;
+    }
+
+    .tab.active {
+      background: #1e2a3a;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 500;
+      color: #8b9bb0;
+      letter-spacing: 0.2px;
+    }
+
+    .input-wrapper {
+      background: #0b1119;
+      border: 1px solid #1e2835;
+      border-radius: 16px;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: border 0.15s;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: #3b82f6;
+    }
+
+    .input-wrapper input {
+      background: transparent;
+      border: none;
+      padding: 12px 0;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 500;
+      outline: none;
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .input-wrapper input::placeholder {
+      color: #4a5a6e;
+      font-weight: 400;
+    }
+
+    .input-wrapper .unit {
+      font-size: 14px;
+      color: #7e8c9e;
+      font-weight: 500;
+    }
+
+    .quick-percent {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .quick-percent button {
+      background: #141e2b;
+      border: 1px solid #1e2a38;
+      border-radius: 30px;
+      padding: 6px 0;
+      flex: 1;
+      color: #9aa9bb;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+
+    .quick-percent button:hover {
+      background: #1e2c3c;
+      color: #d0e0ff;
+      border-color: #2f4055;
+    }
+
+    .action-btn {
+      background: #2b6eef;
+      border: none;
+      padding: 16px;
+      border-radius: 18px;
+      color: white;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 10px 20px -10px #2b6eef;
+      margin-top: 6px;
+    }
+
+    .action-btn:hover {
+      background: #3b7eff;
+    }
+
+    .action-btn:active {
+      transform: scale(0.98);
+    }
+
+    .recent-trades .trade-item {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 10px 0;
+      border-bottom: 1px solid #1b232f;
+    }
+
+    .trade-item .pair {
+      font-weight: 600;
+      color: #d0ddeb;
+    }
+
+    .trade-item .side-buy {
+      color: #1dc9a0;
+      font-weight: 600;
+      background: rgba(29, 201, 160, 0.1);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+    }
+
+    .trade-item .side-sell {
+      color: #f87171;
+      font-weight: 600;
+      background: rgba(248, 113, 113, 0.1);
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+    }
+
+    .trade-item .trade-price {
+      font-weight: 500;
+      color: #bac8da;
+    }
+
+    /* responsive */
+    @media (max-width: 1100px) {
+      .main-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+      .trade-panel {
+        grid-template-columns: 1fr;
+      }
+      .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .nav-links {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dashboard { padding: 16px; }
+      .card { padding: 16px; }
+      .balance-badge span { font-size: 12px; }
+    }
+
+    /* small animations */
+    .watchlist .coin-row:hover {
+      background: #151e29;
+      margin: 0 -8px;
+      padding: 12px 8px;
+      border-radius: 12px;
+      transition: all 0.1s;
+    }
+
+    .card {
+      transition: border 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: #2e3d52;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- top navigation -->
+    <div class="top-bar">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="logo-text">TradeFlow</div>
+      </div>
+
+      <div class="nav-links">
+        <a href="#" class="active"><i class="fas fa-chart-pie" style="margin-right: 6px;"></i>Dashboard</a>
+        <a href="#"><i class="fas fa-chart-bar" style="margin-right: 6px;"></i>Markets</a>
+        <a href="#"><i class="fas fa-wallet" style="margin-right: 6px;"></i>Portfolio</a>
+        <a href="#"><i class="fas fa-cog" style="margin-right: 6px;"></i>Settings</a>
+      </div>
+
+      <div class="user-area">
+        <div class="balance-badge">
+          <i class="fas fa-dollar-sign"></i>
+          <span>$ 24,680.50</span>
+        </div>
+        <div class="avatar">JD</div>
+      </div>
+    </div>
+
+    <!-- main grid: watchlist, chart, order book -->
+    <div class="main-grid">
+      <!-- watchlist card -->
+      <div class="card watchlist">
+        <div class="card-header">
+          <h2><i class="fas fa-star"></i> Watchlist</h2>
+          <button class="more-btn"><i class="fas fa-ellipsis-h"></i></button>
+        </div>
+        <div class="coin-row">
+          <div class="coin-info">
+            <div class="coin-icon"><i class="fab fa-bitcoin"></i></div>
+            <div>
+              <div class="coin-name">Bitcoin</div>
+              <div class="coin-ticker">BTC / USD</div>
+            </div>
+          </div>
+          <div class="price-info">
+            <div class="price">$63,420.80</div>
+            <div class="change up"><i class="fas fa-caret-up"></i> +2.34%</div>
+          </div>
+        </div>
+        <div class="coin-row">
+          <div class="coin-info">
+            <div class="coin-icon eth"><i class="fab fa-ethereum"></i></div>
+            <div>
+              <div class="coin-name">Ethereum</div>
+              <div class="coin-ticker">ETH / USD</div>
+            </div>
+          </div>
+          <div class="price-info">
+            <div class="price">$3,045.20</div>
+            <div class="change up"><i class="fas fa-caret-up"></i> +1.12%</div>
+          </div>
+        </div>
+        <div class="coin-row">
+          <div class="coin-info">
+            <div class="coin-icon sol"><i class="fas fa-sun"></i></div>
+            <div>
+              <div class="coin-name">Solana</div>
+              <div class="coin-ticker">SOL / USD</div>
+            </div>
+          </div>
+          <div class="price-info">
+            <div class="price">$142.75</div>
+            <div class="change down"><i class="fas fa-caret-down"></i> -0.87%</div>
+          </div>
+        </div>
+        <div class="coin-row">
+          <div class="coin-info">
+            <div class="coin-icon xrp"><i class="fas fa-coins"></i></div>
+            <div>
+              <div class="coin-name">Ripple</div>
+              <div class="coin-ticker">XRP / USD</div>
+            </div>
+          </div>
+          <div class="price-info">
+            <div class="price">$0.5124</div>
+            <div class="change up"><i class="fas fa-caret-up"></i> +0.63%</div>
+          </div>
+        </div>
+        <div class="coin-row">
+          <div class="coin-info">
+            <div class="coin-icon" style="color: #f3ba2f;"><i class="fab fa-btc"></i></div>
+            <div>
+              <div class="coin-name">BNB</div>
+              <div class="coin-ticker">BNB / USD</div>
+            </div>
+          </div>
+          <div class="price-info">
+            <div class="price">$580.30</div>
+            <div class="change up"><i class="fas fa-caret-up"></i> +0.45%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- portfolio chart card -->
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="card-header">
+            <h2><i class="fas fa-chart-pie"></i> Portfolio</h2>
+            <button class="more-btn"><i class="fas fa-ellipsis-h"></i></button>
+          </div>
+          <div class="chart-header">
+            <div>
+              <div class="portfolio-label">Total value</div>
+              <div class="portfolio-value">$24,680.50</div>
+            </div>
+            <div class="change-large"><i class="fas fa-arrow-up"></i> +3.42%</div>
+          </div>
+        </div>
+        <div class="chart-bars">
+          <div class="bar-wrapper">
+            <div class="bar" style="height: 64px;"></div>
+            <div class="bar-label">Mon</div>
+          </div>
+          <div class="bar-wrapper">
+            <div class="bar" style="height: 42px;"></div>
+            <div class="bar-label">Tue</div>
+          </div>
+          <div class="bar-wrapper">
+            <div class="bar" style="height: 78px;"></div>
+            <div class="bar-label">Wed</div>
+          </div>
+          <div class="bar-wrapper">
+            <div class="bar" style="height: 55px;"></div>
+            <div class="bar-label">Thu</div>
+          </div>
+          <div class="bar-wrapper">
+            <div class="bar green" style="height: 96px;"></div>
+            <div class="bar-label">Fri</div>
+          </div>
+          <div class="bar-wrapper">
+            <div class="bar green" style="height: 110px;"></div>
+            <div class="bar-label">Sat</div>
+          </div>
+          <div class="bar-wrapper">
+            <div class="bar green" style="height: 88px;"></div>
+            <div class="bar-label">Sun</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- order book card -->
+      <div class="card order-book">
+        <div class="card-header">
+          <h2><i class="fas fa-list-ul"></i> Order Book</h2>
+          <button class="more-btn"><i class="fas fa-ellipsis-h"></i></button>
+        </div>
+        <!-- asks (sell) -->
+        <div style="margin-bottom: 6px;">
+          <div class="order-row">
+            <span class="price-ask">63,850.20</span>
+            <span class="amount">0.42</span>
+            <span class="total">$26,817</span>
+          </div>
+          <div class="order-depth-bar"><div class="fill ask" style="width: 78%;"></div></div>
+          <div class="order-row">
+            <span class="price-ask">63,720.10</span>
+            <span class="amount">0.18</span>
+            <span class="total">$11,470</span>
+          </div>
+          <div class="order-depth-bar"><div class="fill ask" style="width: 45%;"></div></div>
+          <div class="order-row">
+            <span class="price-ask">63,610.50</span>
+            <span class="amount">0.75</span>
+            <span class="total">$47,708</span>
+          </div>
+          <div class="order-depth-bar"><div class="fill ask" style="width: 92%;"></div></div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="last-price">63,420.80 <small>≈ $63.4k</small></div>
+        <div class="divider"></div>
+
+        <!-- bids (buy) -->
+        <div>
+          <div class="order-row">
+            <span class="price-bid">63,380.40</span>
+            <span class="amount">0.63</span>
+            <span class="total">$39,930</span>
+          </div>
+          <div class="order-depth-bar"><div class="fill" style="width: 85%;"></div></div>
+          <div class="order-row">
+            <span class="price-bid">63,290.20</span>
+            <span class="amount">0.24</span>
+            <span class="total">$15,189</span>
+          </div>
+          <div class="order-depth-bar"><div class="fill" style="width: 52%;"></div></div>
+          <div class="order-row">
+            <span class="price-bid">63,150.70</span>
+            <span class="amount">1.05</span>
+            <span class="total">$66,308</span>
+          </div>
+          <div class="order-depth-bar"><div class="fill" style="width: 96%;"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- bottom: trade form + recent trades -->
+    <div class="trade-panel">
+      <div class="card trade-form">
+        <div class="tabs">
+          <button class="tab active" id="buyTab">Buy</button>
+          <button class="tab" id="sellTab">Sell</button>
+        </div>
+        <div class="input-group">
+          <label>Amount (BTC)</label>
+          <div class="input-wrapper">
+            <input type="text" id="amountInput" placeholder="0.00" value="0.05">
+            <span class="unit">BTC</span>
+          </div>
+          <div class="quick-percent">
+            <button>25%</button>
+            <button>50%</button>
+            <button>75%</button>
+            <button>100%</button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Estimated total</label>
+          <div class="input-wrapper">
+            <input type="text" id="totalInput" placeholder="0.00" value="3,171.04" readonly style="color: #b0c8f0; font-weight: 600;">
+            <span class="unit">USD</span>
+          </div>
+        </div>
+        <button class="action-btn" id="tradeButton">Buy BTC</button>
+      </div>
+
+      <!-- recent trades card -->
+      <div class="card recent-trades">
+        <div class="card-header">
+          <h2><i class="fas fa-history"></i> Recent Trades</h2>
+          <button class="more-btn"><i class="fas fa-ellipsis-h"></i></button>
+        </div>
+        <div class="trade-item">
+          <span class="pair">BTC/USD</span>
+          <span class="side-buy">BUY</span>
+          <span class="trade-price">63,402.10</span>
+          <span style="color: #7e8c9e; font-size: 11px;">12:42:21</span>
+        </div>
+        <div class="trade-item">
+          <span class="pair">ETH/USD</span>
+          <span class="side-sell">SELL</span>
+          <span class="trade-price">3,038.50</span>
+          <span style="color: #7e8c9e; font-size: 11px;">12:41:05</span>
+        </div>
+        <div class="trade-item">
+          <span class="pair">SOL/USD</span>
+          <span class="side-buy">BUY</span>
+          <span class="trade-price">142.80</span>
+          <span style="color: #7e8c9e; font-size: 11px;">12:40:33</span>
+        </div>
+        <div class="trade-item">
+          <span class="pair">BTC/USD</span>
+          <span class="side-sell">SELL</span>
+          <span class="trade-price">63,415.75</span>
+          <span style="color: #7e8c9e; font-size: 11px;">12:38:12</span>
+        </div>
+        <div class="trade-item" style="border-bottom: none;">
+          <span class="pair">XRP/USD</span>
+          <span class="side-buy">BUY</span>
+          <span class="trade-price">0.5128</span>
+          <span style="color: #7e8c9e; font-size: 11px;">12:36:44</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- realistic JS interactions -->
+  <script>
+    (function() {
+      // --- toggle Buy/Sell tabs ---
+      const buyTab = document.getElementById('buyTab');
+      const sellTab = document.getElementById('sellTab');
+      const tradeButton = document.getElementById('tradeButton');
+      const amountInput = document.getElementById('amountInput');
+      const totalInput = document.getElementById('totalInput');
+
+      // last price for btc (hardcoded realistic)
+      const BTC_PRICE = 63420.80;
+
+      // update total based on amount
+      function updateTotal() {
+        const amount = parseFloat(amountInput.value) || 0;
+        const total = amount * BTC_PRICE;
+        totalInput.value = total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      // switch to buy
+      buyTab.addEventListener('click', function() {
+        buyTab.classList.add('active');
+        sellTab.classList.remove('active');
+        tradeButton.textContent = 'Buy BTC';
+        tradeButton.style.background = '#2b6eef';
+        tradeButton.style.boxShadow = '0 10px 20px -10px #2b6eef';
+      });
+
+      // switch to sell
+      sellTab.addEventListener('click', function() {
+        sellTab.classList.add('active');
+        buyTab.classList.remove('active');
+        tradeButton.textContent = 'Sell BTC';
+        tradeButton.style.background = '#f87171';
+        tradeButton.style.boxShadow = '0 10px 20px -10px #f87171';
+      });
+
+      // update total when amount changes
+      amountInput.addEventListener('input', updateTotal);
+
+      // quick percent buttons (mock)
+      const percentButtons = document.querySelectorAll('.quick-percent button');
+      percentButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          // demo: set amount based on percentage of assumed 2 BTC balance
+          const percentMap = { '25%': 0.25, '50%': 0.5, '75%': 0.75, '100%': 1 };
+          const percentage = percentMap[this.textContent.trim()] || 0.1;
+          // realistic: set amount to some fraction (total BTC available approx 0.8)
+          const available = 0.8;
+          const newAmount = (available * percentage).toFixed(4);
+          amountInput.value = parseFloat(newAmount);
+          updateTotal();
+        });
+      });
+
+      // initialize total
+      updateTotal();
+
+      // trade button click — simulate order
+      tradeButton.addEventListener('click', function() {
+        const amount = parseFloat(amountInput.value) || 0;
+        if (amount <= 0) {
+          alert('Please enter a valid amount.');
+          return;
+        }
+        const isBuy = buyTab.classList.contains('active');
+        const action = isBuy ? 'Buy' : 'Sell';
+        alert(`${action} order placed:\n${amount} BTC at market price.`);
+        // (no real backend, just realism)
+      });
+
+      // add real-time feel: update total on input already done.
+      // also update the last price a tiny bit? not needed.
+
+      // additional realism: hover effect on cards is in css.
+      // also make more-btn clickable (mock)
+      document.querySelectorAll('.more-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          // do nothing, just visual feedback
+        });
+      });
+
+      // watchlist rows clickable (console only)
+      document.querySelectorAll('.watchlist .coin-row').forEach(row => {
+        row.addEventListener('click', function() {
+          const coinName = this.querySelector('.coin-name')?.innerText || 'coin';
+          console.log(`Selected ${coinName}`);
+        });
+      });
+
+      // recent trade items subtle feedback
+      document.querySelectorAll('.trade-item').forEach(item => {
+        item.addEventListener('click', function() {
+          // highlight effect
+          this.style.backgroundColor = '#19232f';
+          setTimeout(() => this.style.backgroundColor = 'transparent', 150);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
